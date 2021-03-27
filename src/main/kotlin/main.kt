@@ -8,5 +8,8 @@ fun main(args: Array<String>) {
     val initCommand = InitCommand()
     val convertCommand = ConvertCommand()
     parser.subcommands(initCommand, convertCommand)
-    parser.parse(args)
+    val result = parser.parse(args)
+
+    println("command is " + result.commandName)
+//    parser.makeUsage()
 }
