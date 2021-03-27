@@ -8,8 +8,11 @@ fun main(args: Array<String>) {
     val initCommand = InitCommand()
     val convertCommand = ConvertCommand()
     parser.subcommands(initCommand, convertCommand)
-    val result = parser.parse(args)
+    parser.parse(args)
 
-    println("command is " + result.commandName)
-//    parser.makeUsage()
+    // HACK to print usage by default, like `git`
+    val makeUsageFn = parser.javaClass.getDeclaredMethod("makeUsage\$kotlinx_cli")
+    makeUsageFn.isAccessible = true
+    val usageText = makeUsageFn.invoke(parser) as String
+    println(usageText)
 }

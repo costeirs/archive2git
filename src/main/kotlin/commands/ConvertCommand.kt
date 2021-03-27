@@ -13,8 +13,8 @@ import java.nio.file.StandardOpenOption
 
 @ExperimentalCli
 class ConvertCommand: Subcommand("convert", "Converts archive to git") {
-    val rootDir by argument(ArgType.String, description = "Input directory").optional()
-    val configFile by option(ArgType.String, description = "Config file").default("archive2git.json")
+    private val rootDir by argument(ArgType.String, description = "Input directory").optional()
+    private val config by option(ArgType.String, description = "Config file").default("archive2git.json")
 
     override fun execute() {
         val path = when (rootDir) {
@@ -24,7 +24,7 @@ class ConvertCommand: Subcommand("convert", "Converts archive to git") {
         require(path.exists() && path.isDirectory) { "bad path: \"$rootDir\" (resolved to ${path.absolutePath})" }
         println("will process $path")
 
-        val configFile = File(Paths.get(path.absolutePath, "archive2git.json").toFile().absolutePath)
+        val configFile = File(Paths.get(path.absolutePath, config).toFile().absolutePath)
         val settings = Json.decodeFromString<Settings>(configFile.readText())
         println(settings)
 

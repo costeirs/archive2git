@@ -2,22 +2,29 @@
 
 Convert folder of releases to a git repository.
 
-Useful for consulting engagements, for clients using folder-based version control.
+Useful for consulting engagements, to transition clients using folder-based version control to git.
+
+## Requirements
+
+- Java 8+.
 
 ## Usage
 
 ### Init
 
-```shell
-java -jar archive2git.jar init [path]
-```
+Scans a given directory and generates a configuration file.
 
-- `path`: defaults to current directory 
+```shell
+archive2git init [--committer] [path]
+```
+- `committer`: name which will appear on commit messages. Defaults to "archive2git".
+- `path`: defaults to current directory.
 
 ### Convert
 
 ```shell
-java -jar archive2git.jar convert [path]
+archive2git convert [--config] [path]
 ```
 
-- `path`: defaults to current directory 
+- `config`: defaults to 'archive2git.json'.
+- `path`: defaults to current directory.
