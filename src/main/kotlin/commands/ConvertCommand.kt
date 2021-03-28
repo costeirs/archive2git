@@ -1,5 +1,6 @@
 package commands
 
+import common.defaultConfigFileName
 import common.firstNonEmpty
 import kotlinx.cli.*
 import kotlinx.serialization.decodeFromString
@@ -9,15 +10,16 @@ import org.apache.commons.io.FileUtils
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.PersonIdent
 import java.io.File
-import java.nio.file.*
-import java.nio.file.Files.createTempDirectory
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.Instant
 import java.util.*
 
 @ExperimentalCli
 class ConvertCommand : Subcommand("convert", "Converts archive to git") {
     private val root by argument(ArgType.String, description = "Input directory").optional()
-    private val config by option(ArgType.String, description = "Config file").default("archive2git.json")
+    private val config by option(ArgType.String, description = "Config file")
 
     override fun execute() {
         val rootDir = when (root) {
@@ -25,13 +27,23 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
             else -> File(root!!)
         }
         require(rootDir.exists() && rootDir.isDirectory) { "bad path: \"${this.root}\" (resolved to ${rootDir.absolutePath})" }
-        println("will process $rootDir")
+        println("Working in ${rootDir.absolutePath}.")
 
-        val configFile = File(Paths.get(rootDir.absolutePath, config).toFile().absolutePath)
+        val configFile = if (config == null) {
+            val path = Path.of(rootDir.absolutePath, defaultConfigFileName)
+            println("Config file was not provided. Will look for config file at default location $path ...")
+            path.toFile()
+        } else {
+            File(config!!)
+        }
+        if (!configFile.exists()) {
+            error("Could not find config file.")
+        }
+        println("Using config file ${configFile.absolutePath}.")
+
         val settings = Json.decodeFromString<Settings>(configFile.readText())
 
-        val tempDir = createTempDirectory("archive2git")
-        println("Working in $tempDir")
+        val tempDir = Files.createDirectory(Path.of(rootDir.absolutePath, rootDir.name + "-converted"))
         val tempDirFile = tempDir.toFile()
 
         val repo = Git.init()
@@ -39,7 +51,7 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
             .call()
 
         for (folder in settings.releases) {
-            println("Processing ${folder.path}")
+            println("Processing ${folder.title}")
 
             // clean work dir (skipping .git folder)
             tempDirFile.listFiles { _, name -> name != ".git" }!!.forEach {

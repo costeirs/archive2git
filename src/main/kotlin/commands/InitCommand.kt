@@ -1,5 +1,6 @@
 package commands
 
+import common.defaultConfigFileName
 import kotlinx.cli.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -7,6 +8,7 @@ import models.ReleasesFolder
 import models.Settings
 import java.io.File
 import java.io.FileFilter
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Instant
 import java.time.LocalDateTime
@@ -42,9 +44,9 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
                 }
         )
 
-        val output = Json.encodeToString(settings)
+        val output = Json { prettyPrint = true }.encodeToString(settings)
 
-        val configFile = File(Paths.get(path.absolutePath, "archive2git.json").toFile().absolutePath)
+        val configFile = Path.of(path.absolutePath, defaultConfigFileName).toFile()
         configFile.writeText(output)
 
         println("Wrote archive2git config to " + configFile.absolutePath)

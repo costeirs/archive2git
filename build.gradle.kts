@@ -21,6 +21,9 @@ dependencies {
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r")
     implementation("commons-io:commons-io:2.8.0")
 
+    implementation("org.slf4j:slf4j-api:1.7.30")
+    implementation("org.slf4j:slf4j-simple:1.7.30")
+
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.1")
