@@ -1,4 +1,4 @@
-package serializers
+package com.costeira.archive2git.serializers
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer

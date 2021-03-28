@@ -1,5 +1,5 @@
-import commands.ConvertCommand
-import commands.InitCommand
+import com.costeira.archive2git.commands.ConvertCommand
+import com.costeira.archive2git.commands.InitCommand
 import kotlinx.cli.*
 
 @ExperimentalCli

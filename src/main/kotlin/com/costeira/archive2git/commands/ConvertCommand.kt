@@ -1,11 +1,11 @@
-package commands
+package com.costeira.archive2git.commands
 
-import common.defaultConfigFileName
-import common.firstNonEmpty
+import com.costeira.archive2git.common.defaultConfigFileName
+import com.costeira.archive2git.common.firstNonEmpty
 import kotlinx.cli.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import models.Settings
+import com.costeira.archive2git.models.Settings
 import org.apache.commons.io.FileUtils
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.PersonIdent

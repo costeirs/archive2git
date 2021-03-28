@@ -1,11 +1,11 @@
-package commands
+package com.costeira.archive2git.commands
 
-import common.defaultConfigFileName
+import com.costeira.archive2git.common.defaultConfigFileName
 import kotlinx.cli.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import models.ReleasesFolder
-import models.Settings
+import com.costeira.archive2git.models.ReleasesFolder
+import com.costeira.archive2git.models.Settings
 import java.io.File
 import java.io.FileFilter
 import java.nio.file.Path

@@ -1,4 +1,4 @@
-package models
+package com.costeira.archive2git.models
 
 import kotlinx.serialization.Serializable
 
