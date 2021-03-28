@@ -12,16 +12,18 @@ import org.apache.commons.io.FileUtils
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.PersonIdent
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.time.Instant
+import java.time.ZoneId
 import java.util.*
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.exists
 
 class ConvertCommand : Subcommand("convert", "Converts archive to git") {
     private val root by argument(ArgType.String, description = "Input directory").optional()
     private val config by option(ArgType.String, description = "Config file")
 
+    @ExperimentalPathApi
     override fun execute() {
         val rootDir = when (root) {
             null -> Paths.get("").toAbsolutePath().toFile()
@@ -32,7 +34,7 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
 
         val configFile = if (config == null) {
             val path = Path.of(rootDir.absolutePath, defaultConfigFileName)
-            println("Config file was not provided. Will look for config file at default location $path ...")
+            println("Config file was not provided. Will look for config file with default name $path...")
             path.toFile()
         } else {
             File(config!!)
@@ -44,25 +46,28 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
 
         val settings = Json.decodeFromString<Settings>(configFile.readText())
 
-        val tempDir = Files.createDirectory(Path.of(rootDir.absolutePath, rootDir.name + "-converted"))
-        val tempDirFile = tempDir.toFile()
+        val workdirPath = Path.of(rootDir.absolutePath, rootDir.name + "-converted")
+        if (workdirPath.exists()) {
+            error("$workdirPath already exists. Stopping to prevent overwrite.")
+        }
+        val workdir = workdirPath.toFile()
 
         val repo = Git.init()
-            .setDirectory(tempDirFile)
+            .setDirectory(workdir)
             .call()
 
-        for (folder in settings.releases) {
-            println("Processing ${folder.title}")
+        for (release in settings.releases) {
+            println("Processing ${release.title}")
 
             // clean work dir (skipping .git folder)
-            tempDirFile.listFiles { _, name -> name != ".git" }!!.forEach {
+            workdir.listFiles { _, name -> name != ".git" }!!.forEach {
                 repo.rm().addFilepattern(it.name).call()
             }
 
             // copy files
             FileUtils.copyDirectory(
-                Path.of(rootDir.absolutePath, folder.path).toFile(),
-                tempDirFile,
+                Path.of(rootDir.absolutePath, release.path).toFile(),
+                workdir,
                 true
             )
 
@@ -72,17 +77,20 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
                 .call()
 
             // git commit
-            val name = firstNonEmpty(folder.committer, settings.committer, default = "archive2git")
+            val name = firstNonEmpty(release.committer, settings.committer, default = "archive2git")
             val email = "archive2git"
+            val tz = TimeZone.getDefault()
+            val date =
+                if (release.at == null) Date() else Date.from(release.at.atZone(tz.toZoneId()).toInstant())
             val ident = PersonIdent(
                 name,
                 email,
-                Date.from(Instant.now()),
-                TimeZone.getDefault()
+                date,
+                tz
             )
 
             repo.commit()
-                .setMessage(folder.title)
+                .setMessage(release.title)
                 .setCommitter(ident)
                 .call()
         }

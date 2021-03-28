@@ -4,6 +4,7 @@ import com.costeira.archive2git.serializers.DateSerializer
 import kotlinx.serialization.Serializable
 import java.time.LocalDateTime
 
+@Serializable
 data class ReleasesFolder(
     val path: String,
     val title: String,
