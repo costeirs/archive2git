@@ -15,14 +15,12 @@ import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.exists
 
 class ConvertCommand : Subcommand("convert", "Converts archive to git") {
     private val root by argument(ArgType.String, description = "Input directory").optional()
     private val config by option(ArgType.String, description = "Config file")
 
-    @ExperimentalPathApi
     override fun execute() {
         val rootDir = when (root) {
             null -> Paths.get("").toAbsolutePath().toFile()
@@ -45,6 +43,10 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
 
         val settings = Json.decodeFromString<Settings>(configFile.readText())
 
+        work(rootDir, settings)
+    }
+
+    fun work(rootDir: File, settings: Settings) {
         val workdirPath = Path.of(rootDir.absolutePath, rootDir.name + "-converted")
         if (workdirPath.exists()) {
             error("$workdirPath already exists. Stopping to prevent overwrite.")

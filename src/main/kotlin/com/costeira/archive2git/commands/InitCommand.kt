@@ -18,17 +18,19 @@ import java.time.LocalDateTime
 import java.util.*
 
 class InitCommand : Subcommand("init", "Generate archive2git config") {
-    private val rootDir by argument(ArgType.String, description = "Input directory").optional()
+    private val root by argument(ArgType.String, description = "Input directory").optional()
 
     private val committer by option(ArgType.String, description = "Committer name").default("archive2git")
     private val prefix by option(ArgType.String, description = "Commit title prefix").default("")
 
     override fun execute() {
-        val path = when (rootDir) {
+        val path = when (root) {
             null -> Paths.get("").toAbsolutePath().toFile()
-            else -> File(rootDir!!)
+            else -> File(root!!)
         }
-        require(path.exists() && path.isDirectory) { "bad path: \"$rootDir\" (resolved to ${path.absolutePath})" }
+        val resolvedPathMessage = if (root != path.absolutePath) " (resolved to ${path.absolutePath})" else ""
+        require(path.exists()) { "Input directory \"$root\"$resolvedPathMessage does not exist." }
+        require(path.isDirectory) { "Input directory \"$root\"$resolvedPathMessage is not a directory." }
 
         val settings = Settings(
             committer = committer,
