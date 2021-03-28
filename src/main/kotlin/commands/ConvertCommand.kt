@@ -29,10 +29,9 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
 
         val configFile = File(Paths.get(rootDir.absolutePath, config).toFile().absolutePath)
         val settings = Json.decodeFromString<Settings>(configFile.readText())
-        println(settings)
 
         val tempDir = createTempDirectory("archive2git")
-        println(tempDir.toString())
+        println("Working in $tempDir")
         val tempDirFile = tempDir.toFile()
 
         val repo = Git.init()
@@ -43,8 +42,8 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
             println("Processing ${folder.path}")
 
             // clean work dir (skipping .git folder)
-            File(tempDirFile, folder.path).listFiles { _, name -> name != ".git" }!!.forEach {
-                it.deleteRecursively()
+            tempDirFile.listFiles { _, name -> name != ".git" }!!.forEach {
+                repo.rm().addFilepattern(it.name).call()
             }
 
             // copy files
@@ -53,7 +52,6 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
                 tempDirFile,
                 true
             )
-//            Files.copy(Path.of(rootDir.absolutePath, folder.path), tempDir, StandardCopyOption.COPY_ATTRIBUTES)
 
             // git add
             repo.add()
@@ -63,10 +61,12 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
             // git commit
             val name = firstNonEmpty(folder.committer, settings.committer, default = "archive2git")
             val email = "archive2git"
-            val ident = PersonIdent(name,
+            val ident = PersonIdent(
+                name,
                 email,
                 Date.from(Instant.now()),
-                TimeZone.getDefault())
+                TimeZone.getDefault()
+            )
 
             repo.commit()
                 .setMessage(folder.title)
@@ -76,6 +76,6 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
 
         repo.close()
 
-        println("done")
+        println("Done.")
     }
 }
