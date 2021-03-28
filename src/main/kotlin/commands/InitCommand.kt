@@ -8,8 +8,8 @@ import models.Settings
 import java.io.File
 import java.io.FileFilter
 import java.nio.file.Paths
+import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.*
 
 @ExperimentalCli
@@ -17,6 +17,7 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
     private val rootDir by argument(ArgType.String, description = "Input directory").optional()
 
     private val committer by option(ArgType.String, description = "Committer name").default("archive2git")
+    private val prefix by option(ArgType.String, description = "Commit title prefix").default("")
 
     override fun execute() {
         val path = when (rootDir) {
@@ -29,10 +30,16 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
             committer = committer,
             releases = path.listFiles(FileFilter { it.isDirectory })
                 .orEmpty()
-                .map { ReleasesFolder(
-                    path = it.name,
-                    title = "Release " + LocalDateTime.ofInstant(Date(it.lastModified()).toInstant(), ZoneId.systemDefault()).toLocalDate()
-                ) }
+                .map {
+                    ReleasesFolder(
+                        path = it.name,
+                        title = prefix + it.name,
+                        at = LocalDateTime.ofInstant(
+                            Instant.ofEpochMilli(it.lastModified()),
+                            TimeZone.getDefault().toZoneId()
+                        )
+                    )
+                }
         )
 
         val output = Json.encodeToString(settings)
@@ -40,6 +47,6 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
         val configFile = File(Paths.get(path.absolutePath, "archive2git.json").toFile().absolutePath)
         configFile.writeText(output)
 
-        println("Initialized archive2git in " + configFile.absolutePath)
+        println("Wrote archive2git config to " + configFile.absolutePath)
     }
 }

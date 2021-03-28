@@ -6,7 +6,7 @@ Useful for consulting engagements, to transition clients using folder-based vers
 
 ## Requirements
 
-- Java 8+.
+- Java 11+.
 
 ## Usage
 

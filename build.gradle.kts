@@ -12,7 +12,7 @@ version = "1.0"
 
 repositories {
     mavenCentral()
-    maven("https://kotlin.bintray.com/kotlinx")
+    maven("https://kotlin.bintray.com/kotlinx") // TODO remove once kotlinx-cli is in mavenCentral
 }
 
 dependencies {
@@ -31,12 +31,8 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
-
-//application {
-//    mainClassName = "MainKt"
-//}
 
 val jar by tasks.getting(Jar::class) {
     manifest {

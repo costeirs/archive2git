@@ -17,10 +17,10 @@ object DateSerializer : KSerializer<LocalDateTime> {
 
 
     override fun serialize(encoder: Encoder, value: LocalDateTime) {
-        encoder.encodeString(value.toString())
+        encoder.encodeString(timeFormatter.format(value))
     }
 
-    private val timeFormatter = DateTimeFormatter.ofPattern("YYYY/M/d [HH:mm]")
+    private val timeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
 
     override fun deserialize(decoder: Decoder): LocalDateTime {
         return LocalDateTime.parse(decoder.decodeString(), timeFormatter)
