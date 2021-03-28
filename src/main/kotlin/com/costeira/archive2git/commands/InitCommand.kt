@@ -1,11 +1,14 @@
 package com.costeira.archive2git.commands
 
 import com.costeira.archive2git.common.defaultConfigFileName
-import kotlinx.cli.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import com.costeira.archive2git.models.ReleasesFolder
 import com.costeira.archive2git.models.Settings
+import kotlinx.cli.ArgType
+import kotlinx.cli.Subcommand
+import kotlinx.cli.default
+import kotlinx.cli.optional
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileFilter
 import java.nio.file.Path
@@ -14,7 +17,6 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.util.*
 
-@ExperimentalCli
 class InitCommand : Subcommand("init", "Generate archive2git config") {
     private val rootDir by argument(ArgType.String, description = "Input directory").optional()
 

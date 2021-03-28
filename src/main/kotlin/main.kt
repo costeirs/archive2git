@@ -1,8 +1,7 @@
 import com.costeira.archive2git.commands.ConvertCommand
 import com.costeira.archive2git.commands.InitCommand
-import kotlinx.cli.*
+import kotlinx.cli.ArgParser
 
-@ExperimentalCli
 fun main(args: Array<String>) {
     val parser = ArgParser("archive2git")
     val initCommand = InitCommand()

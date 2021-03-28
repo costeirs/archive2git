@@ -2,10 +2,12 @@ package com.costeira.archive2git.commands
 
 import com.costeira.archive2git.common.defaultConfigFileName
 import com.costeira.archive2git.common.firstNonEmpty
-import kotlinx.cli.*
+import com.costeira.archive2git.models.Settings
+import kotlinx.cli.ArgType
+import kotlinx.cli.Subcommand
+import kotlinx.cli.optional
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import com.costeira.archive2git.models.Settings
 import org.apache.commons.io.FileUtils
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.PersonIdent
@@ -16,7 +18,6 @@ import java.nio.file.Paths
 import java.time.Instant
 import java.util.*
 
-@ExperimentalCli
 class ConvertCommand : Subcommand("convert", "Converts archive to git") {
     private val root by argument(ArgType.String, description = "Input directory").optional()
     private val config by option(ArgType.String, description = "Config file")

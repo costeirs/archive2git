@@ -1,6 +1,5 @@
 package com.costeira.archive2git.serializers
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -10,7 +9,6 @@ import kotlinx.serialization.encoding.Encoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-@ExperimentalSerializationApi
 @Serializer(forClass = DateSerializer::class)
 object DateSerializer : KSerializer<LocalDateTime> {
     override val descriptor = PrimitiveSerialDescriptor(LocalDateTime::class.simpleName!!, PrimitiveKind.STRING)

@@ -35,6 +35,8 @@ tasks.test {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
+    kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlinx.cli.ExperimentalCli"
+    kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi"
 }
 
 val jar by tasks.getting(Jar::class) {
