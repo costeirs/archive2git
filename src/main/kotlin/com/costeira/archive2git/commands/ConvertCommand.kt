@@ -1,7 +1,7 @@
 package com.costeira.archive2git.commands
 
 import com.costeira.archive2git.common.defaultConfigFileName
-import com.costeira.archive2git.common.firstNonEmpty
+import com.costeira.archive2git.common.firstNonBlank
 import com.costeira.archive2git.models.Settings
 import kotlinx.cli.ArgType
 import kotlinx.cli.Subcommand
@@ -14,7 +14,6 @@ import org.eclipse.jgit.lib.PersonIdent
 import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.time.ZoneId
 import java.util.*
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.exists
@@ -77,7 +76,7 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
                 .call()
 
             // git commit
-            val name = firstNonEmpty(release.committer, settings.committer, default = "archive2git")
+            val name = firstNonBlank(release.committer, settings.committer, default = "archive2git").trim()
             val email = "archive2git"
             val tz = TimeZone.getDefault()
             val date =
