@@ -1,3 +1,5 @@
+package com.costeira.archive2git
+
 import com.costeira.archive2git.commands.ConvertCommand
 import com.costeira.archive2git.commands.InitCommand
 import kotlinx.cli.ArgParser
