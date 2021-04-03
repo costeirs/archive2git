@@ -3,7 +3,9 @@ package com.costeira.archive2git.commands
 import com.costeira.archive2git.models.ReleasesFolder
 import com.costeira.archive2git.models.Settings
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import java.time.LocalDateTime
@@ -45,5 +47,33 @@ internal class ConvertCommandTest {
         // assert
         val configFile = Path(tempDir.toString(), tempDir.name + "-converted")
         assertTrue { configFile.exists() }
+    }
+
+    @Nested
+    inner class ValidateSettings {
+
+        @Test
+        fun `requires at least one release`() {
+            val settings = Settings(releases = emptyList())
+            val subject = ConvertCommand()
+
+            assertThrows<IllegalArgumentException> { subject.validateSettings(settings) }
+        }
+
+        @Test
+        fun `requires each release have a title`() {
+            val settings = Settings(releases = listOf(ReleasesFolder(title = "   ", path = "dummy")))
+            val subject = ConvertCommand()
+
+            assertThrows<IllegalArgumentException> { subject.validateSettings(settings) }
+        }
+
+        @Test
+        fun `requires each release have a path`() {
+            val settings = Settings(releases = listOf(ReleasesFolder(title = "dummy", path = "   ")))
+            val subject = ConvertCommand()
+
+            assertThrows<IllegalArgumentException> { subject.validateSettings(settings) }
+        }
     }
 }

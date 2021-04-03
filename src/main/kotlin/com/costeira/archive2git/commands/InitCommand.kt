@@ -28,7 +28,7 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
             null -> Paths.get("").toAbsolutePath().toFile()
             else -> File(root!!)
         }
-        val resolvedPathMessage = if (root != path.absolutePath) " (resolved to ${path.absolutePath})" else ""
+        val resolvedPathMessage = if (root != path.canonicalPath) " (resolved to ${path.canonicalPath})" else ""
         require(path.exists()) { "Input directory \"$root\"$resolvedPathMessage does not exist." }
         require(path.isDirectory) { "Input directory \"$root\"$resolvedPathMessage is not a directory." }
 
@@ -53,6 +53,6 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
         val configFile = Path.of(path.absolutePath, defaultConfigFileName).toFile()
         configFile.writeText(output)
 
-        println("Wrote archive2git config to " + configFile.absolutePath)
+        println("Wrote archive2git config to " + configFile.canonicalPath)
     }
 }

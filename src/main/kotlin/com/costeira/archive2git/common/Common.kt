@@ -1,7 +1,17 @@
 package com.costeira.archive2git.common
 
+import java.util.jar.Manifest
+
+const val defaultConfigFileName = "archive2git.json"
+
 fun firstNonBlank(vararg items: String?, default: String): String {
     return items.firstOrNull { !it.isNullOrBlank() } ?: default
 }
 
-const val defaultConfigFileName = "archive2git.json"
+fun getAppVersion(): String {
+    val stream = object {}.javaClass.getResourceAsStream("/META-INF/MANIFEST.MF")
+    val manifest = Manifest(stream)
+    val attr = manifest.mainAttributes
+
+    return attr.getValue("Implementation-Version") ?: "unknown"
+}

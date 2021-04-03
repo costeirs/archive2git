@@ -5,7 +5,6 @@ plugins {
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
 
-    application
     id("com.github.ben-manes.versions") version "0.38.0"
 }
 
@@ -40,10 +39,6 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlinx.cli.ExperimentalCli"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi"
-}
-
-application {
-    mainClass.set("com.costeira.archive2git.MainKt")
 }
 
 val jar by tasks.getting(Jar::class) {

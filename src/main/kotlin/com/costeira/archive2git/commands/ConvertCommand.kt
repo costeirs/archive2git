@@ -26,8 +26,8 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
             null -> Paths.get("").toAbsolutePath().toFile()
             else -> File(root!!)
         }
-        require(rootDir.exists() && rootDir.isDirectory) { "bad path: \"${this.root}\" (resolved to ${rootDir.absolutePath})" }
-        println("Working in ${rootDir.absolutePath}.")
+        require(rootDir.exists() && rootDir.isDirectory) { "bad path: \"${this.root}\" (resolved to ${rootDir.canonicalPath})" }
+        println("Working in ${rootDir.canonicalPath}.")
 
         val configFile = if (config == null) {
             val path = Path.of(rootDir.absolutePath, defaultConfigFileName)
@@ -39,11 +39,22 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
         if (!configFile.exists()) {
             error("Could not find config file.")
         }
-        println("Using config file ${configFile.absolutePath}.")
+        println("Using config file ${configFile.canonicalPath}.")
 
         val settings = Json.decodeFromString<Settings>(configFile.readText())
 
+        validateSettings(settings)
+
         work(rootDir, settings)
+    }
+
+    internal fun validateSettings(settings: Settings) {
+        require(settings.releases.isNotEmpty()) { "No releases are defined." }
+
+        for ((i, release) in settings.releases.withIndex()) {
+            require(release.title.isNotBlank()) { "Release #$i: title is blank or not set." }
+            require(release.path.isNotBlank()) { "Release #$i: path is blank or not set."}
+        }
     }
 
     fun work(rootDir: File, settings: Settings) {
