@@ -10,7 +10,7 @@ Useful for consulting engagements, to transition clients using folder-based vers
 
 ## Installation
 
-Download the latest release and use it via `java -jar archive2git.jar ...`.
+Download the latest release and use it via `./archive2git ...`, or add it to your PATH for long-term use.
 
 ## Usage
 
@@ -19,7 +19,7 @@ Download the latest release and use it via `java -jar archive2git.jar ...`.
 Scans a given directory and generates a configuration file.
 
 ```shell
-init [--committer] [path]
+archive2git init [--committer] [path]
 ```
 - `committer`: name which will appear on commit messages. Defaults to "archive2git".
 - `path`: defaults to current directory.
@@ -27,13 +27,13 @@ init [--committer] [path]
 ### Convert
 
 ```shell
-convert [--config] [path]
+archive2git convert [--config] [path]
 ```
 
-- `config`: defaults to 'archive2git.json'.
+- `config`: defaults to 'archive2git.json' in the `path`.
 - `path`: defaults to current directory.
 
-## Config File
+## Config File Options
 
 - `committer`: (optional) name of committer, defaults to "archive2git".
 - `releases`: array of releases to generate:
@@ -41,3 +41,7 @@ convert [--config] [path]
     - `title`: commit title.
     - `at`: (optional) date/time of commit, defaults to now.
     - `committer` (optional) name of committer, overrides `committer` global option.
+
+## License
+
+Archive2git is open-sourced software licensed under the [Apache 2.0 license](LICENSE).

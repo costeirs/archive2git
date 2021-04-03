@@ -1,10 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.31"
-    kotlin("plugin.serialization") version "1.4.31"
+    val kotlinVersion = "1.4.32"
+    kotlin("jvm") version kotlinVersion
+    kotlin("plugin.serialization") version kotlinVersion
 
     application
+    id("com.github.ben-manes.versions") version "0.38.0"
 }
 
 group = "com.costeira"
@@ -40,11 +42,34 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi"
 }
 
+application {
+    mainClass.set("com.costeira.archive2git.MainKt")
+}
+
 val jar by tasks.getting(Jar::class) {
     manifest {
         attributes["Main-Class"] = "com.costeira.archive2git.MainKt"
+        attributes["Implementation-Version"] = archiveVersion
     }
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }) {
         exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
+    }
+}
+
+// From https://github.com/pinterest/ktlint/blob/master/ktlint/build.gradle#L41
+tasks.register("shellExecutable") {
+    description = "Creates self-executable file, that runs generated jar"
+    group = "Distribution"
+
+    inputs.files(tasks.named("jar"))
+    outputs.file(file("${buildDir}/bin/${project.name}"))
+
+    doLast {
+        val execFile = outputs.files.files.first()
+        execFile.outputStream().use {
+            it.write("#!/bin/sh\n\nexec java -Xmx512m -jar \"\$0\" \"\$@\"\n\n".toByteArray())
+            it.write(inputs.files.singleFile.readBytes())
+        }
+        execFile.setExecutable(true, false)
     }
 }
