@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 internal class CommonKtTest {
 
     @Test
-    fun firstNonEmpty() {
+    fun firstNonBlank() {
         assertEquals("a", firstNonBlank("a", "b", default = "c"))
         assertEquals("a", firstNonBlank("a", null, default = "c"))
         assertEquals("b", firstNonBlank("", "b", default = "c"))
