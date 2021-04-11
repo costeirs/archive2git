@@ -49,7 +49,7 @@ internal class InitCommandTest {
     }
 
     @Test
-    fun `input path doesn't exist`() {
+    fun `input path must exist`() {
         // arrange
         val inputDir = Path(tempDir, "non-existent-folder")
 
@@ -60,7 +60,7 @@ internal class InitCommandTest {
         val exception = assertThrows<IllegalArgumentException> { parser.parse(arrayOf("init", inputDir.toString())) }
 
         // assert
-        assertEquals("Input directory \"$inputDir\" does not exist.", exception.message)
+        assertEquals("Input directory does not exist.", exception.message)
     }
 
     @Test
@@ -76,6 +76,18 @@ internal class InitCommandTest {
         val exception = assertThrows<IllegalArgumentException> { parser.parse(arrayOf("init", inputDir.toString())) }
 
         // assert
-        assertEquals("Input directory \"$inputDir\" is not a directory.", exception.message)
+        assertEquals("Input directory is not a directory.", exception.message)
+    }
+
+    @Test
+    fun `input path must have at least one folder`() {
+        // act
+        val parser = ArgParser("archive2git")
+        val subject = InitCommand()
+        parser.subcommands(subject)
+        val exception = assertThrows<IllegalArgumentException> { parser.parse(arrayOf("init", tempDir)) }
+
+        // assert
+        assertEquals("Input directory must contain at least one folder.", exception.message)
     }
 }

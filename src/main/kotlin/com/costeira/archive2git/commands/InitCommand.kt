@@ -29,13 +29,17 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
             else -> File(root!!)
         }
         val resolvedPathMessage = if (root != path.canonicalPath) " (resolved to ${path.canonicalPath})" else ""
-        require(path.exists()) { "Input directory \"$root\"$resolvedPathMessage does not exist." }
-        require(path.isDirectory) { "Input directory \"$root\"$resolvedPathMessage is not a directory." }
+        println("Will use \"$root\"$resolvedPathMessage as input directory.")
+
+        require(path.exists()) { "Input directory does not exist." }
+        require(path.isDirectory) { "Input directory is not a directory." }
+
+        val folders = path.listFiles(FileFilter { it.isDirectory }).orEmpty()
+        require(folders.isNotEmpty()) { "Input directory must contain at least one folder." }
 
         val settings = Settings(
             committer = committer,
-            releases = path.listFiles(FileFilter { it.isDirectory })
-                .orEmpty()
+            releases = folders
                 .map {
                     ReleasesFolder(
                         path = it.name,
