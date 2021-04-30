@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.4.32"
+    val kotlinVersion = "1.5.0"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
 
@@ -13,12 +13,11 @@ version = "1.0"
 
 repositories {
     mavenCentral()
-    maven("https://kotlin.bintray.com/kotlinx") // TODO remove once kotlinx-cli is in mavenCentral
 }
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r")
     implementation("commons-io:commons-io:2.8.0")
 
