@@ -28,8 +28,12 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
             null -> Paths.get("").toAbsolutePath().toFile()
             else -> File(root!!)
         }
-        val resolvedPathMessage = if (root != path.canonicalPath) " (resolved to ${path.canonicalPath})" else ""
-        println("Will use \"$root\"$resolvedPathMessage as input directory.")
+        if (root == null) {
+            println("Input path was not provided. Defaulting to current directory: $path")
+        } else {
+            val resolvedPathMessage = if (root != path.canonicalPath) " (resolved to ${path.canonicalPath})" else ""
+            println("Will use \"$root\"$resolvedPathMessage as input directory.")
+        }
 
         require(path.exists()) { "Input directory does not exist." }
         require(path.isDirectory) { "Input directory is not a directory." }

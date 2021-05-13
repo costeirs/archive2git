@@ -16,6 +16,7 @@ import kotlin.io.path.createDirectory
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 internal class InitCommandTest {
@@ -46,6 +47,27 @@ internal class InitCommandTest {
 
         val settings = Json.decodeFromString<Settings>(configFile.readText())
         assertEquals(2, settings.releases.count())
+    }
+
+    @Test
+    fun `happy path all defaults`() {
+        // arrange
+        Path(tempDir, "first").createDirectory()
+        Path(tempDir, "second").createDirectory()
+        Path(tempDir, "file").toFile().writeText("asdf") // should be skipped
+
+        // act
+        val parser = ArgParser("archive2git")
+        val subject = InitCommand()
+        parser.subcommands(subject)
+        assertDoesNotThrow { parser.parse(arrayOf("init")) }
+
+        // assert
+        val configFile = Path(defaultConfigFileName)
+        assertTrue { configFile.exists() }
+
+        val settings = Json.decodeFromString<Settings>(configFile.readText())
+        assertNotEquals(0, settings.releases.count())
     }
 
     @Test

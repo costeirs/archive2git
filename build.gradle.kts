@@ -17,7 +17,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.11.0.202103091610-r")
     implementation("commons-io:commons-io:2.8.0")
 
@@ -37,7 +37,6 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlinx.cli.ExperimentalCli"
     kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlinx.serialization.ExperimentalSerializationApi"
-    kotlinOptions.freeCompilerArgs += "-Xuse-experimental=kotlin.io.path.ExperimentalPathApi"
 }
 
 val jar by tasks.getting(Jar::class) {
@@ -46,7 +45,7 @@ val jar by tasks.getting(Jar::class) {
         attributes["Implementation-Version"] = archiveVersion
     }
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }) {
-        exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA")
+        exclude("META-INF/*.RSA", "META-INF/*.SF", "META-INF/*.DSA", "META-INF/maven/", "/META-INF/*.kotlin_module", "about.html", "plugin.properties")
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 }
