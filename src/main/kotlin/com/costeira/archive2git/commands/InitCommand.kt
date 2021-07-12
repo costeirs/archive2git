@@ -24,21 +24,20 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
     private val prefix by option(ArgType.String, description = "Commit title prefix").default("")
 
     override fun execute() {
-        val path = when (root) {
-            null -> Paths.get("").toAbsolutePath().toFile()
-            else -> File(root!!)
-        }
+        val workdir: File
         if (root == null) {
-            println("Input path was not provided. Defaulting to current directory: $path")
+            workdir = Paths.get("").toAbsolutePath().toFile()
+            println("Input path was not provided. Defaulting to current directory: $workdir")
         } else {
-            val resolvedPathMessage = if (root != path.canonicalPath) " (resolved to ${path.canonicalPath})" else ""
+            workdir = File(root!!)
+            val resolvedPathMessage = if (root != workdir.canonicalPath) " (resolved to ${workdir.canonicalPath})" else ""
             println("Will use \"$root\"$resolvedPathMessage as input directory.")
         }
 
-        require(path.exists()) { "Input directory does not exist." }
-        require(path.isDirectory) { "Input directory is not a directory." }
+        require(workdir.exists()) { "Input directory does not exist." }
+        require(workdir.isDirectory) { "Input directory is not a directory." }
 
-        val folders = path.listFiles(FileFilter { it.isDirectory }).orEmpty()
+        val folders = workdir.listFiles(FileFilter { it.isDirectory }).orEmpty()
         require(folders.isNotEmpty()) { "Input directory must contain at least one folder." }
 
         val settings = Settings(
@@ -58,7 +57,7 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
 
         val output = Json { prettyPrint = true }.encodeToString(settings)
 
-        val configFile = Path.of(path.absolutePath, defaultConfigFileName).toFile()
+        val configFile = Path.of(workdir.absolutePath, defaultConfigFileName).toFile()
         configFile.writeText(output)
 
         println("Wrote archive2git config to " + configFile.canonicalPath)

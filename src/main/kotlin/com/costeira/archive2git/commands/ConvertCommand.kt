@@ -58,11 +58,10 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
     }
 
     fun work(rootDir: File, settings: Settings) {
-        val workdirPath = Path.of(rootDir.absolutePath, rootDir.name + "-converted")
-        if (workdirPath.exists()) {
-            error("$workdirPath already exists. Stopping to prevent overwrite.")
+        val workdir = Path.of(rootDir.absolutePath, rootDir.name + "-converted").toFile()
+        if (workdir.exists()) {
+            error("$workdir already exists. Stopping to prevent overwrite.")
         }
-        val workdir = workdirPath.toFile()
 
         val repo = Git.init()
             .setDirectory(workdir)
