@@ -1,11 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    val kotlinVersion = "1.5.20"
+    val kotlinVersion = "1.5.30-RC"
     kotlin("jvm") version kotlinVersion
     kotlin("plugin.serialization") version kotlinVersion
 
     id("com.github.ben-manes.versions") version "0.39.0"
+    id("io.gitlab.arturbosch.detekt") version("1.18.0")
 }
 
 group = "com.costeira"
@@ -19,10 +20,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-cli:0.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.2")
     implementation("org.eclipse.jgit:org.eclipse.jgit:5.12.0.202106070339-r")
-    implementation("commons-io:commons-io:2.10.0")
+    implementation("commons-io:commons-io:2.11.0")
 
-    implementation("org.slf4j:slf4j-api:1.7.30")
-    implementation("org.slf4j:slf4j-simple:1.7.30")
+    implementation("org.slf4j:slf4j-api:1.7.32")
+    implementation("org.slf4j:slf4j-simple:1.7.32")
 
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")

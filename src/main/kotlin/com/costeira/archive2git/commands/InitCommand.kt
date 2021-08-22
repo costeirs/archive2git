@@ -1,6 +1,6 @@
 package com.costeira.archive2git.commands
 
-import com.costeira.archive2git.common.defaultConfigFileName
+import com.costeira.archive2git.common.DEFAULT_CONFIG_FILE_NAME
 import com.costeira.archive2git.models.ReleasesFolder
 import com.costeira.archive2git.models.Settings
 import kotlinx.cli.ArgType
@@ -30,7 +30,8 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
             println("Input path was not provided. Defaulting to current directory: $workdir")
         } else {
             workdir = File(root!!)
-            val resolvedPathMessage = if (root != workdir.canonicalPath) " (resolved to ${workdir.canonicalPath})" else ""
+            val resolvedPathMessage =
+                if (root != workdir.canonicalPath) " (resolved to ${workdir.canonicalPath})" else ""
             println("Will use \"$root\"$resolvedPathMessage as input directory.")
         }
 
@@ -57,7 +58,7 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
 
         val output = Json { prettyPrint = true }.encodeToString(settings)
 
-        val configFile = Path.of(workdir.absolutePath, defaultConfigFileName).toFile()
+        val configFile = Path.of(workdir.absolutePath, DEFAULT_CONFIG_FILE_NAME).toFile()
         configFile.writeText(output)
 
         println("Wrote archive2git config to " + configFile.canonicalPath)

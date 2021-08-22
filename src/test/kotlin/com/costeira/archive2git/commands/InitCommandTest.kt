@@ -1,6 +1,6 @@
 package com.costeira.archive2git.commands
 
-import com.costeira.archive2git.common.defaultConfigFileName
+import com.costeira.archive2git.common.DEFAULT_CONFIG_FILE_NAME
 import com.costeira.archive2git.models.Settings
 import kotlinx.cli.ArgParser
 import kotlinx.serialization.decodeFromString
@@ -42,7 +42,7 @@ internal class InitCommandTest {
         assertDoesNotThrow { parser.parse(arrayOf("init", tempDir)) }
 
         // assert
-        val configFile = Path(tempDir, defaultConfigFileName)
+        val configFile = Path(tempDir, DEFAULT_CONFIG_FILE_NAME)
         assertTrue { configFile.exists() }
 
         val settings = Json.decodeFromString<Settings>(configFile.readText())
@@ -63,7 +63,7 @@ internal class InitCommandTest {
         assertDoesNotThrow { parser.parse(arrayOf("init")) }
 
         // assert
-        val configFile = Path(defaultConfigFileName)
+        val configFile = Path(DEFAULT_CONFIG_FILE_NAME)
         assertTrue { configFile.exists() }
 
         val settings = Json.decodeFromString<Settings>(configFile.readText())

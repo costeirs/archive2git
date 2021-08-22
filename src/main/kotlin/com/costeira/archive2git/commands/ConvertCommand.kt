@@ -1,6 +1,6 @@
 package com.costeira.archive2git.commands
 
-import com.costeira.archive2git.common.defaultConfigFileName
+import com.costeira.archive2git.common.DEFAULT_CONFIG_FILE_NAME
 import com.costeira.archive2git.common.firstNonBlank
 import com.costeira.archive2git.models.Settings
 import kotlinx.cli.ArgType
@@ -15,7 +15,6 @@ import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
-import kotlin.io.path.exists
 
 class ConvertCommand : Subcommand("convert", "Converts archive to git") {
     private val root by argument(ArgType.String, description = "Input directory").optional()
@@ -26,11 +25,13 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
             null -> Paths.get("").toAbsolutePath().toFile()
             else -> File(root!!)
         }
-        require(rootDir.exists() && rootDir.isDirectory) { "bad path: \"${this.root}\" (resolved to ${rootDir.canonicalPath})" }
+        require(rootDir.exists() && rootDir.isDirectory) {
+            "bad path: \"${this.root}\" (resolved to ${rootDir.canonicalPath})"
+        }
         println("Working in ${rootDir.canonicalPath}.")
 
         val configFile = if (config == null) {
-            val path = Path.of(rootDir.absolutePath, defaultConfigFileName)
+            val path = Path.of(rootDir.absolutePath, DEFAULT_CONFIG_FILE_NAME)
             println("Config file was not provided. Will look for config file with default name $path...")
             path.toFile()
         } else {
@@ -53,7 +54,7 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
 
         for ((i, release) in settings.releases.withIndex()) {
             require(release.title.isNotBlank()) { "Release #$i: title is blank or not set." }
-            require(release.path.isNotBlank()) { "Release #$i: path is blank or not set."}
+            require(release.path.isNotBlank()) { "Release #$i: path is blank or not set." }
         }
     }
 
