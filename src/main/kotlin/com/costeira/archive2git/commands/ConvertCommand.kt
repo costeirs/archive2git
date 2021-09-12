@@ -32,7 +32,8 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
 
         val configFile = if (config == null) {
             val path = Path.of(rootDir.absolutePath, DEFAULT_CONFIG_FILE_NAME)
-            println("Config file was not provided. Will look for config file with default name $path...")
+            println("Config file was not provided. " +
+                "Looking in current directory for config file with default name: $path...")
             path.toFile()
         } else {
             File(config!!)

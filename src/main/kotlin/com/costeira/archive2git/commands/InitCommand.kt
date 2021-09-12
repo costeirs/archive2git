@@ -23,6 +23,8 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
     private val committer by option(ArgType.String, description = "Committer name").default("archive2git")
     private val prefix by option(ArgType.String, description = "Commit title prefix").default("")
 
+    private val jsonSerializer = Json { prettyPrint = true }
+
     override fun execute() {
         val workdir: File
         if (root == null) {
@@ -56,7 +58,7 @@ class InitCommand : Subcommand("init", "Generate archive2git config") {
                 }
         )
 
-        val output = Json { prettyPrint = true }.encodeToString(settings)
+        val output = jsonSerializer.encodeToString(settings)
 
         val configFile = Path.of(workdir.absolutePath, DEFAULT_CONFIG_FILE_NAME).toFile()
         configFile.writeText(output)
