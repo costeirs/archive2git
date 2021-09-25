@@ -6,7 +6,12 @@ import org.junit.jupiter.api.Test
 internal class MainKtTest {
 
     @Test
-    fun main() {
+    fun default() {
+        assertDoesNotThrow { main(emptyArray()) }
+    }
+
+    @Test
+    fun `shows version`() {
         assertDoesNotThrow { main(arrayOf("--version")) }
     }
 }

@@ -2,55 +2,125 @@ package com.costeira.archive2git.commands
 
 import com.costeira.archive2git.models.ReleasesFolder
 import com.costeira.archive2git.models.Settings
-import org.junit.jupiter.api.Assertions.assertTrue
+import kotlinx.cli.ArgParser
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.Path
 import kotlin.io.path.createDirectory
-import kotlin.io.path.exists
 import kotlin.io.path.name
+import kotlin.io.path.writeText
 
 internal class ConvertCommandTest {
 
-    @Test
-    fun `happy path`(@TempDir tempDir: Path) {
-        // arrange
-        Path(tempDir.toString(), "first").createDirectory()
-        Path(tempDir.toString(), "first", "file").toFile().writeText("first commit")
-        Path(tempDir.toString(), "second").createDirectory()
-        Path(tempDir.toString(), "second", "file").toFile().writeText("second commit")
-        Path(tempDir.toString(), "file").toFile().writeText("asdf") // should be skipped
+    @Nested
+    inner class Execute {
 
-        val settings = Settings(
-            releases = listOf(
-                ReleasesFolder(
-                    path = "first",
-                    title = "first release",
-                    at = LocalDateTime.of(2021, 1, 2, 3, 4, 5)
-                ),
-                ReleasesFolder(
-                    path = "second",
-                    title = "second release",
-                    at = LocalDateTime.of(2021, 1, 3, 4, 5, 6)
-                ),
+        @Test
+        fun `happy path`(@TempDir tempDir: Path) {
+            // arrange
+            Path(tempDir.toString(), "first").createDirectory()
+            Path(tempDir.toString(), "first", "file").writeText("first commit")
+            Path(tempDir.toString(), "second").createDirectory()
+            Path(tempDir.toString(), "second", "file").writeText("second commit")
+            Path(tempDir.toString(), "file").writeText("asdf") // should be skipped
+
+            val settings = Settings(
+                releases = listOf(
+                    ReleasesFolder(
+                        path = "first",
+                        title = "first release",
+                        at = LocalDateTime.of(2021, 1, 2, 3, 4, 5)
+                    ),
+                    ReleasesFolder(
+                        path = "second",
+                        title = "second release"
+                    ),
+                )
             )
-        )
 
-        // act
-        val subject = ConvertCommand()
-        subject.work(tempDir.toFile(), settings)
+            val jsonSerializer = Json { prettyPrint = true }
+            val configFile = Path(tempDir.toString(), "archive2git.json")
+            configFile.writeText(jsonSerializer.encodeToString(settings))
 
-        // assert
-        val configFile = Path(tempDir.toString(), tempDir.name + "-converted")
-        assertTrue { configFile.exists() }
+            // act
+            val parser = ArgParser("archive2git")
+            val subject = ConvertCommand()
+            parser.subcommands(subject)
+
+            // assert
+            assertDoesNotThrow {
+                parser.parse(arrayOf("convert", tempDir.toString(), "--config", configFile.toString()))
+            }
+        }
+
+        @Test
+        fun `input directory must exist`(@TempDir tempDir: Path) {
+            val inputDir = Path(tempDir.toString(), "file")
+            inputDir.writeText("asdf")
+
+            // act
+            val parser = ArgParser("archive2git")
+            val subject = ConvertCommand()
+            parser.subcommands(subject)
+
+            // assert
+            assertThrows<IllegalArgumentException> {
+                parser.parse(arrayOf("convert", "$inputDir/nonexistent-folder"))
+            }
+        }
+
+        @Test
+        fun `input directory must be a directory`(@TempDir tempDir: Path) {
+            val inputDir = Path(tempDir.toString(), "file")
+            inputDir.writeText("asdf")
+
+            // act
+            val parser = ArgParser("archive2git")
+            val subject = ConvertCommand()
+            parser.subcommands(subject)
+
+            // assert
+            assertThrows<IllegalArgumentException> {
+                parser.parse(arrayOf("convert", inputDir.toString()))
+            }
+        }
+
+        @Test
+        fun `config does not exist`(@TempDir tempDir: Path) {
+            // act
+            val parser = ArgParser("archive2git")
+            val subject = ConvertCommand()
+            parser.subcommands(subject)
+
+            // assert
+            assertThrows<IllegalArgumentException> {
+                parser.parse(arrayOf("convert", tempDir.toString()))
+            }
+        }
     }
 
     @Nested
     inner class ValidateSettings {
+
+        @Test
+        fun `happy path`() {
+            val settings = Settings(
+                releases = listOf(
+                    ReleasesFolder(title = "first", path = "a"),
+                    ReleasesFolder(title = "second", path = "b")
+                )
+            )
+            val subject = ConvertCommand()
+
+            assertDoesNotThrow { subject.validateSettings(settings) }
+        }
 
         @Test
         fun `requires at least one release`() {
@@ -74,6 +144,21 @@ internal class ConvertCommandTest {
             val subject = ConvertCommand()
 
             assertThrows<IllegalArgumentException> { subject.validateSettings(settings) }
+        }
+    }
+
+    @Nested
+    inner class Work {
+        @Test
+        fun `will not overwrite already converted project`(@TempDir tempDir: Path) {
+            // arrange
+            Path(tempDir.toString(), tempDir.name + "-converted").createDirectory()
+            // act
+            val settings = Settings(releases = listOf(ReleasesFolder(title = "example", path = "dummy")))
+            val subject = ConvertCommand()
+
+            // assert
+            assertThrows<IllegalStateException> { subject.work(tempDir.toFile(), settings) }
         }
     }
 }

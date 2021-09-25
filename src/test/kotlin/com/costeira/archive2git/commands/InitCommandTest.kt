@@ -11,10 +11,7 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
-import kotlin.io.path.Path
-import kotlin.io.path.createDirectory
-import kotlin.io.path.exists
-import kotlin.io.path.readText
+import kotlin.io.path.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
@@ -33,7 +30,7 @@ internal class InitCommandTest {
         // arrange
         Path(tempDir, "first").createDirectory()
         Path(tempDir, "second").createDirectory()
-        Path(tempDir, "file").toFile().writeText("asdf") // should be skipped
+        Path(tempDir, "file").writeText("asdf") // should be skipped
 
         // act
         val parser = ArgParser("archive2git")
@@ -54,7 +51,7 @@ internal class InitCommandTest {
         // arrange
         Path(tempDir, "first").createDirectory()
         Path(tempDir, "second").createDirectory()
-        Path(tempDir, "file").toFile().writeText("asdf") // should be skipped
+        Path(tempDir, "file").writeText("asdf") // should be skipped
 
         // act
         val parser = ArgParser("archive2git")
@@ -88,7 +85,7 @@ internal class InitCommandTest {
     @Test
     fun `input path is file`() {
         // arrange
-        val inputDir = Path(tempDir, "file").toFile()
+        val inputDir = Path(tempDir, "file")
         inputDir.writeText("asdf")
 
         // act
@@ -111,5 +108,20 @@ internal class InitCommandTest {
 
         // assert
         assertEquals("Input directory must contain at least one folder.", exception.message)
+    }
+
+    @Test
+    fun `input path must canonicalize`() {
+        // arrange
+        Path(tempDir, "first").createDirectory()
+
+        // act
+        val parser = ArgParser("archive2git")
+        val subject = InitCommand()
+        parser.subcommands(subject)
+        val dir = "$tempDir/././././"
+
+        // assert
+        assertDoesNotThrow { parser.parse(arrayOf("init", dir)) }
     }
 }

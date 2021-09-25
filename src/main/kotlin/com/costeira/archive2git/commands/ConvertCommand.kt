@@ -2,6 +2,7 @@ package com.costeira.archive2git.commands
 
 import com.costeira.archive2git.common.DEFAULT_CONFIG_FILE_NAME
 import com.costeira.archive2git.common.firstNonBlank
+import com.costeira.archive2git.common.getPathAndCanonical
 import com.costeira.archive2git.models.Settings
 import kotlinx.cli.ArgType
 import kotlinx.cli.Subcommand
@@ -25,22 +26,25 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
             null -> Paths.get("").toAbsolutePath().toFile()
             else -> File(root!!)
         }
-        require(rootDir.exists() && rootDir.isDirectory) {
-            "bad path: \"${this.root}\" (resolved to ${rootDir.canonicalPath})"
+        require(rootDir.exists()) {
+            "Input directory must exist: " + getPathAndCanonical(rootDir)
+        }
+        require(rootDir.isDirectory) {
+            "Path provided is not a directory?: " + getPathAndCanonical(rootDir)
         }
         println("Working in ${rootDir.canonicalPath}.")
 
         val configFile = if (config == null) {
             val path = Path.of(rootDir.absolutePath, DEFAULT_CONFIG_FILE_NAME)
-            println("Config file was not provided. " +
-                "Looking in current directory for config file with default name: $path...")
+            println(
+                "Config file was not provided. " +
+                    "Looking in current directory for config file with default name: $path..."
+            )
             path.toFile()
         } else {
             File(config!!)
         }
-        if (!configFile.exists()) {
-            error("Could not find config file.")
-        }
+        require(configFile.exists()) { "Could not find config file." }
         println("Using config file ${configFile.canonicalPath}.")
 
         val settings = Json.decodeFromString<Settings>(configFile.readText())
@@ -61,9 +65,7 @@ class ConvertCommand : Subcommand("convert", "Converts archive to git") {
 
     fun work(rootDir: File, settings: Settings) {
         val workdir = Path.of(rootDir.absolutePath, rootDir.name + "-converted").toFile()
-        if (workdir.exists()) {
-            error("$workdir already exists. Stopping to prevent overwrite.")
-        }
+        check(!workdir.exists()) { "$workdir already exists. Stopping to prevent overwrite." }
 
         val repo = Git.init()
             .setDirectory(workdir)

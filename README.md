@@ -10,7 +10,8 @@ Useful for consulting engagements, to transition clients using folder-based vers
 
 ## Installation
 
-Download the latest release and use it via `./archive2git ...`, or add it to your PATH for long-term use.
+Download the latest release and make it executable (`chmod +x archive2git`). 
+Optionally, add it to your PATH for long-term use.
 
 ## Usage
 
@@ -19,24 +20,27 @@ Download the latest release and use it via `./archive2git ...`, or add it to you
 Scans a given directory and generates a configuration file.
 
 ```shell
-archive2git init [--committer] [path]
+archive2git init <path> [--committer] [--prefix] [--sort]
 ```
-- `committer`: name which will appear on commit messages. Defaults to "archive2git".
 - `path`: defaults to current directory.
+- `committer`: name which will appear on commit messages. Defaults to "archive2git".
+- `prefix`: (optional) string to prepend to release titles.
+
+> ☞ Review the config file for correct ordering and customize before converting.
 
 ### Convert
 
 ```shell
-archive2git convert [--config] [path]
+archive2git convert <path> [--config]
 ```
 
-- `config`: defaults to 'archive2git.json' in the `path`.
 - `path`: defaults to current directory.
+- `config`: defaults to "archive2git.json" in the `path`.
 
-## Config File Options
+## Config File Schema
 
 - `committer`: (optional) name of committer, defaults to "archive2git".
-- `releases`: array of releases to generate:
+- `releases`: array of releases to convert:
     - `path`: path to folder.
     - `title`: commit title.
     - `at`: (optional) date/time of commit, defaults to now.
